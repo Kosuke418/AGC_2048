@@ -6,6 +6,30 @@ using UnityEngine.UI;
 public class Tile : MonoBehaviour
 {
 
+    public int indRow;
+    public int indCol;
+
+    public int Number
+    {
+        get// Numberから値を取得するときはnumberを吐き出す
+        {
+            return number;
+        }
+        set// Numberに値を代入するとき(value=代入した値)は0のときSetEmpty実行それ以外でApplyStyleSetVis実行
+        {
+            number = value;
+            if (number == 0)
+                SetEmpty();
+            else
+            {
+                ApplyStyle(number);
+                SetVisible();
+            }
+        }
+    }
+
+    private int number;
+
     private Text TileText;
     private Image TileImage;
 
@@ -15,9 +39,9 @@ public class Tile : MonoBehaviour
         TileImage = transform.Find("NumberedCell").GetComponent<Image>();
     }
 
-    void ApplyStyleFromHolder(int index)
+    void ApplyStyleFromHolder(int index)　//TileStyleHolderから呼び出した[index]の文字，文字色，画像色をこのタイルに入れる
     {
-        TileText.text = TileStyleHolder.Instance.TileStyles[index].Number;
+        TileText.text = TileStyleHolder.Instance.TileStyles[index].Number.ToString();
         TileText.color = TileStyleHolder.Instance.TileStyles[index].TextColor;
         TileImage.color = TileStyleHolder.Instance.TileStyles[index].TileColor;
     }
@@ -66,6 +90,18 @@ public class Tile : MonoBehaviour
                 Debug.LogError("Check the numbers that you pass to ApplyStyle!");
                 break;
         }
+    }
+
+    private void SetVisible()
+    {
+        TileImage.enabled = true;//画像を見えるように
+        TileText.enabled = true;//文字を見えるように
+    }
+
+    private void SetEmpty()
+    {
+        TileImage.enabled = false;//画像を見えないように
+        TileText.enabled = false;//文字を見えないように
     }
 
     // Start is called before the first frame update

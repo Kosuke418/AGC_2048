@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class TileStyle
 {
-    public string Number;
+    public int Number;
     public Color32 TileColor;
     public Color32 TextColor;
 }
