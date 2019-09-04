@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class Tile : MonoBehaviour
 {
 
+    public bool mergedThisTurn = false;
+
     public int indRow;
     public int indCol;
 
@@ -30,20 +32,27 @@ public class Tile : MonoBehaviour
 
     private int number;
 
-    private Text TileText;
     private Image TileImage;
+    private GameObject obj;
+    public GameObject canvas;
 
     private void Awake()
     {
-        TileText = GetComponentInChildren<Text>();
+        // TileText = GetComponentInChildren<Text>();
+
         TileImage = transform.Find("NumberedCell").GetComponent<Image>();
+        obj = (GameObject)Resources.Load("MoveTile");
     }
 
-    void ApplyStyleFromHolder(int index)　//TileStyleHolderから呼び出した[index]の文字，文字色，画像色をこのタイルに入れる
+    // TileStyleHolderから呼び出した[index]の文字，文字色，画像色をこのタイルに入れる
+    void ApplyStyleFromHolder(int index)　
     {
+        /*
         TileText.text = TileStyleHolder.Instance.TileStyles[index].Number.ToString();
         TileText.color = TileStyleHolder.Instance.TileStyles[index].TextColor;
         TileImage.color = TileStyleHolder.Instance.TileStyles[index].TileColor;
+        */
+        TileImage.sprite = TileStyleHolder.Instance.TileStyles[index].TileSprite;
     }
 
     void ApplyStyle(int num)
@@ -83,9 +92,6 @@ public class Tile : MonoBehaviour
             case 2048:
                 ApplyStyleFromHolder(10);
                 break;
-            case 4096:
-                ApplyStyleFromHolder(11);
-                break;
             default:
                 Debug.LogError("Check the numbers that you pass to ApplyStyle!");
                 break;
@@ -95,13 +101,22 @@ public class Tile : MonoBehaviour
     private void SetVisible()
     {
         TileImage.enabled = true;//画像を見えるように
-        TileText.enabled = true;//文字を見えるように
     }
 
     private void SetEmpty()
     {
+        TileImage.sprite = null;
         TileImage.enabled = false;//画像を見えないように
-        TileText.enabled = false;//文字を見えないように
+    }
+
+    // クリックされたときナンバーをログに表示し，画像を非表示にする
+    public void OnClickAct()
+    {
+        Debug.Log(this.Number);
+        ThisGameManager.TileNumber = this.Number;
+        ThisGameManager.NumberSprite = TileImage.sprite;
+        this.Number = 0;
+        Instantiate(obj, this.transform.position, Quaternion.identity);
     }
 
     // Start is called before the first frame update
@@ -115,4 +130,5 @@ public class Tile : MonoBehaviour
     {
         
     }
+
 }

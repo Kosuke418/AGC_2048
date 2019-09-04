@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class TileStyle
 {
     public int Number;
-    public Color32 TileColor;
-    public Color32 TextColor;
+    public Sprite TileSprite;
 }
 
 
