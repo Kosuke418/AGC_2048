@@ -3,9 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum GameState
+{
+    Playing,
+    GameOver,
+    WaitingForMoveToEnd
+}
 
 public class ThisGameManager : MonoBehaviour
 {
+
+    public GameState State;
+    [Range(0, 2f)]
+    public float delay;
+    private bool moveMade;
+    private bool[] lineMoveComplete = new bool[4] { true, true, true, true };
 
     private Tile[,] AllTiles = new Tile[4, 4];
     private List<Tile[]> columns = new List<Tile[]>(); //list 長さ可変配列の型
@@ -51,12 +63,36 @@ public class ThisGameManager : MonoBehaviour
         rows.Add(new Tile[] { AllTiles[2, 0], AllTiles[2, 1], AllTiles[2, 2], AllTiles[2, 3] });
         rows.Add(new Tile[] { AllTiles[3, 0], AllTiles[3, 1], AllTiles[3, 2], AllTiles[3, 3] });
 
+        State = GameState.Playing;
+
         Generate();
         Generate();
 
         HPSlider = GameObject.Find("Slider").GetComponent<Slider>();
         HPSlider.value = HP;
         HPText.text = "HP" + HP.ToString();
+    }
+
+    bool CanMove()
+    {
+        if (EmptyTiles.Count > 0)
+            return true;
+        else
+        {
+            // check columns
+            for (int i = 0; i < columns.Count; i++)
+                for (int j = 0; j < rows.Count - 1; j++)
+                    if (AllTiles[j, i].Number == AllTiles[j + 1, i].Number)
+                        return true;
+
+            // check rows
+            for (int i = 0; i < rows.Count; i++)
+                for (int j = 0; j < columns.Count - 1; j++)
+                    if (AllTiles[i, j].Number == AllTiles[i, j + 1].Number)
+                        return true;
+
+        }
+        return false;
     }
 
     //動き
@@ -79,6 +115,7 @@ public class ThisGameManager : MonoBehaviour
                 LineOfTIles[i].Number *= 2;
                 LineOfTIles[i + 1].Number = 0;
                 LineOfTIles[i].mergedThisTurn = true;
+                LineOfTIles[i].PlayMergeAnimation();
                 return true;
             }
         }
@@ -102,6 +139,7 @@ public class ThisGameManager : MonoBehaviour
                 LineOfTIles[i].Number *= 2;
                 LineOfTIles[i - 1].Number = 0;
                 LineOfTIles[i].mergedThisTurn = true;
+                LineOfTIles[i].PlayMergeAnimation();
                 return true;
             }
         }
@@ -117,6 +155,8 @@ public class ThisGameManager : MonoBehaviour
 
             int indexForNewNumber = Random.Range(0, EmptyTiles.Count);
             EmptyTiles[indexForNewNumber].Number = 2;
+
+            EmptyTiles[indexForNewNumber].PlayAppearAnimation();
 
             EmptyTiles.RemoveAt(indexForNewNumber);
             // Debug.Log(EmptyTiles[indexForNewNumber]);
@@ -150,6 +190,14 @@ public class ThisGameManager : MonoBehaviour
             Generate();
         }
 
+        if(HP <= 0)
+        {
+            Debug.Log("倒したぞ");
+            HP = 100;
+            HPSlider.value = HP;
+            HPText.text = "HP" + HP.ToString();
+        }
+
         if (Click)
         {
             UpdateEmptyTiles();
@@ -163,7 +211,7 @@ public class ThisGameManager : MonoBehaviour
                 damage = true;
             }
             level -= 0.05f;
-            Debug.Log(level);
+            // Debug.Log(level);
             damageText.color = new Color(1f, 0f, 0f, level);
             if (level <= 0f)
             {
@@ -197,28 +245,114 @@ public class ThisGameManager : MonoBehaviour
     public void Move(MoveDirection md)
     {
         Debug.Log(md.ToString() + " move,");
+        moveMade = false;
 
         ResetMergedFlags();
-        for (int i = 0; i < rows.Count; i++)
+
+        if (delay > 0)
+            StartCoroutine(MoveCoroutine(md));
+        else
         {
-            switch (md)
+            for (int i = 0; i < rows.Count; i++)
             {
-                case MoveDirection.Down:
-                    while (MakeOneMoveUpIndex(columns[i])) { }
-                    break;
-                case MoveDirection.Left:
-                    while (MakeOneMoveDownIndex(rows[i])) { }
-                    break;
-                case MoveDirection.Right:
-                    while (MakeOneMoveUpIndex(rows[i])) { }
-                    break;
-                case MoveDirection.Up:
-                    while (MakeOneMoveDownIndex(columns[i])) { }
-                    break;
+                switch (md)
+                {
+                    case MoveDirection.Down:
+                        while (MakeOneMoveUpIndex(columns[i]))
+                        {
+                            moveMade = true;
+                        }
+                        break;
+                    case MoveDirection.Left:
+                        while (MakeOneMoveDownIndex(rows[i]))
+                        {
+                            moveMade = true;
+                        }
+                        break;
+                    case MoveDirection.Right:
+                        while (MakeOneMoveUpIndex(rows[i]))
+                        {
+                            moveMade = true;
+                        }
+                        break;
+                    case MoveDirection.Up:
+                        while (MakeOneMoveDownIndex(columns[i]))
+                        {
+                            moveMade = true;
+                        }
+                        break;
+                }
             }
         }
 
-        UpdateEmptyTiles();
-        Generate();
+        if (moveMade)
+        {
+            UpdateEmptyTiles();
+            Generate();
+        }
+    }
+
+    IEnumerator MoveOneLineUpIndexCoroutine(Tile[] line, int index)
+    {
+        lineMoveComplete[index] = false;
+        while (MakeOneMoveUpIndex(line))
+        {
+            moveMade = true;
+            yield return new WaitForSeconds(delay);
+        }
+        lineMoveComplete[index] = true;
+    }
+
+    IEnumerator MoveOneLineDownIndexCoroutine(Tile[] line, int index)
+    {
+        lineMoveComplete[index] = false;
+        while (MakeOneMoveDownIndex(line))
+        {
+            moveMade = true;
+            yield return new WaitForSeconds(delay);
+        }
+        lineMoveComplete[index] = true;
+    }
+
+
+    IEnumerator MoveCoroutine(MoveDirection md)
+    {
+        State = GameState.WaitingForMoveToEnd;
+
+        // start moving each line with delays depending on MoveDirection md
+        switch (md)
+        {
+            case MoveDirection.Down:
+                for (int i = 0; i < columns.Count; i++)
+                    StartCoroutine(MoveOneLineUpIndexCoroutine(columns[i], i));
+                break;
+            case MoveDirection.Left:
+                for (int i = 0; i < rows.Count; i++)
+                    StartCoroutine(MoveOneLineDownIndexCoroutine(rows[i], i));
+                break;
+            case MoveDirection.Right:
+                for (int i = 0; i < rows.Count; i++)
+                    StartCoroutine(MoveOneLineUpIndexCoroutine(rows[i], i));
+                break;
+            case MoveDirection.Up:
+                for (int i = 0; i < columns.Count; i++)
+                    StartCoroutine(MoveOneLineDownIndexCoroutine(columns[i], i));
+                break;
+
+        }
+
+        // Wait until the move is over in all lines
+        while (!(lineMoveComplete[0] && lineMoveComplete[1] && lineMoveComplete[2] && lineMoveComplete[3]))
+            yield return null;
+
+        if (moveMade)
+        {
+            UpdateEmptyTiles();
+            Generate();
+        }
+
+        State = GameState.Playing;
+        StopAllCoroutines();
     }
 }
+

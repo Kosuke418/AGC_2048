@@ -35,13 +35,24 @@ public class Tile : MonoBehaviour
     private Image TileImage;
     private GameObject obj;
     public GameObject canvas;
+    private Animator anim;
 
     private void Awake()
     {
         // TileText = GetComponentInChildren<Text>();
-
+        anim = GetComponent<Animator>();
         TileImage = transform.Find("NumberedCell").GetComponent<Image>();
         obj = (GameObject)Resources.Load("MoveTile");
+    }
+
+    public void PlayMergeAnimation()
+    {
+        anim.SetTrigger("Merge");
+    }
+
+    public void PlayAppearAnimation()
+    {
+        anim.SetTrigger("Appear");
     }
 
     // TileStyleHolderから呼び出した[index]の文字，文字色，画像色をこのタイルに入れる
@@ -112,11 +123,14 @@ public class Tile : MonoBehaviour
     // クリックされたときナンバーをログに表示し，画像を非表示にする
     public void OnClickAct()
     {
-        Debug.Log(this.Number);
-        ThisGameManager.TileNumber = this.Number;
-        ThisGameManager.NumberSprite = TileImage.sprite;
-        this.Number = 0;
-        Instantiate(obj, this.transform.position, Quaternion.identity);
+        if (TileImage.sprite != null)
+        {
+            Debug.Log(this.Number);
+            ThisGameManager.TileNumber = this.Number;
+            ThisGameManager.NumberSprite = TileImage.sprite;
+            this.Number = 0;
+            Instantiate(obj, this.transform.position, Quaternion.identity);
+        }
     }
 
     // Start is called before the first frame update

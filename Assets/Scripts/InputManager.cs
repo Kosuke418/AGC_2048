@@ -27,25 +27,28 @@ public class InputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (gm.State == GameState.Playing)
         {
-            // right move
-            gm.Move(MoveDirection.Right);
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            // left move
-            gm.Move(MoveDirection.Left);
-        }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            // Up move
-            gm.Move(MoveDirection.Up);
-        }
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            // Down move
-            gm.Move(MoveDirection.Down);
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                //right move
+                gm.Move(MoveDirection.Right);
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                //left move
+                gm.Move(MoveDirection.Left);
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                //up move
+                gm.Move(MoveDirection.Up);
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                //down move
+                gm.Move(MoveDirection.Down);
+            }
         }
     }
 }
