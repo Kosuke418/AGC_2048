@@ -125,7 +125,6 @@ public class Tile : MonoBehaviour
     {
         if (TileImage.sprite != null)
         {
-            Debug.Log(this.Number);
             ThisGameManager.TileNumber = this.Number;
             ThisGameManager.NumberSprite = TileImage.sprite;
             this.Number = 0;

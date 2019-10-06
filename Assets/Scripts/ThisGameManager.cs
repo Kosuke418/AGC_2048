@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public enum GameState
@@ -14,8 +15,7 @@ public class ThisGameManager : MonoBehaviour
 {
 
     public GameState State;
-    [Range(0, 2f)]
-    public float delay;
+    float delay = 0.05f;
     private bool moveMade;
     private bool[] lineMoveComplete = new bool[4] { true, true, true, true };
 
@@ -29,6 +29,8 @@ public class ThisGameManager : MonoBehaviour
     [SerializeField]
     private Text HPText;
     [SerializeField]
+    private Text MyHPText;
+    [SerializeField]
     private Image EnemyImage;
 
     public static Sprite NumberSprite;
@@ -37,10 +39,15 @@ public class ThisGameManager : MonoBehaviour
     public static bool damage = false;
 
     private int HP = 100;
+    private int MyHP = 100;
 
     Slider HPSlider;
+    Slider MyHPSlider;
+    Image damageColor;
 
     float level = 1f;
+
+    float Timer = 0;
 
     // Use this for initialization
     void Start()
@@ -69,8 +76,12 @@ public class ThisGameManager : MonoBehaviour
         Generate();
 
         HPSlider = GameObject.Find("Slider").GetComponent<Slider>();
+        MyHPSlider = GameObject.Find("Slider (1)").GetComponent<Slider>();
+        damageColor = GameObject.Find("DamageColor").GetComponent<Image>();
         HPSlider.value = HP;
+        MyHPSlider.value = MyHP;
         HPText.text = "HP" + HP.ToString();
+        MyHPText.text = "HP" + MyHP.ToString();
     }
 
     bool CanMove()
@@ -159,7 +170,6 @@ public class ThisGameManager : MonoBehaviour
             EmptyTiles[indexForNewNumber].PlayAppearAnimation();
 
             EmptyTiles.RemoveAt(indexForNewNumber);
-            // Debug.Log(EmptyTiles[indexForNewNumber]);
         }
         else
         {
@@ -167,32 +177,35 @@ public class ThisGameManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    /*
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-
-
-            Generate();
-
-        }
-
-    }
-    */
-
     private void Update()
     {
+        Timer += Time.deltaTime;
         // Debug.Log(EmptyTiles.Count);
-        if(EmptyTiles.Count == 15)
+
+        if (Timer >= 5f)
+        {
+            damageColor.enabled = true;
+            float level2 = Mathf.Abs(Mathf.Sin(Time.time * 10)) - 0.5f;
+            damageColor.color = new Color(1f, 0f, 0f, level2);
+            if (Timer >= 6f)
+            {
+                MyHP -= 10;
+                MyHPSlider.value = MyHP;
+                MyHPText.text = "HP" + MyHP.ToString();
+                Timer = 0;
+                damageColor.color = new Color(0f, 0f, 0f, 0f);
+                damageColor.enabled = false;
+            }
+        }
+
+        if (EmptyTiles.Count == 15)
         {
             Generate();
         }
 
         if(HP <= 0)
         {
-            Debug.Log("倒したぞ");
+            // SceneManager.LoadScene("");
             HP = 100;
             HPSlider.value = HP;
             HPText.text = "HP" + HP.ToString();
@@ -211,7 +224,6 @@ public class ThisGameManager : MonoBehaviour
                 damage = true;
             }
             level -= 0.05f;
-            // Debug.Log(level);
             damageText.color = new Color(1f, 0f, 0f, level);
             if (level <= 0f)
             {
@@ -244,7 +256,6 @@ public class ThisGameManager : MonoBehaviour
 
     public void Move(MoveDirection md)
     {
-        Debug.Log(md.ToString() + " move,");
         moveMade = false;
 
         ResetMergedFlags();
