@@ -27,6 +27,8 @@ public class ThisGameManager : MonoBehaviour
     [SerializeField]
     private Text damageText;
     [SerializeField]
+    private Text myDamageText;
+    [SerializeField]
     private Text HPText;
     [SerializeField]
     private Text MyHPText;
@@ -37,6 +39,7 @@ public class ThisGameManager : MonoBehaviour
     public static int TileNumber;
     public static bool Click = false;
     public static bool damage = false;
+    public static bool myDamage = false;
 
     private int HP = 100;
     private int MyHP = 100;
@@ -46,6 +49,7 @@ public class ThisGameManager : MonoBehaviour
     Image damageColor;
 
     float level = 1f;
+    float level3 = 1f;
 
     float Timer = 0;
 
@@ -186,15 +190,24 @@ public class ThisGameManager : MonoBehaviour
         {
             damageColor.enabled = true;
             float level2 = Mathf.Abs(Mathf.Sin(Time.time * 10)) - 0.5f;
+            level3 -= 0.02f;
             damageColor.color = new Color(1f, 0f, 0f, level2);
-            if (Timer >= 6f)
+            myDamageText.color = new Color(1f, 0f, 0f, level3);
+            if (!myDamage)
             {
                 MyHP -= 10;
+                myDamageText.text = "-" + 10;
                 MyHPSlider.value = MyHP;
                 MyHPText.text = "HP" + MyHP.ToString();
-                Timer = 0;
+                myDamage = true;
+            }
+            if (level3 <= 0f)
+            {
                 damageColor.color = new Color(0f, 0f, 0f, 0f);
                 damageColor.enabled = false;
+                Timer = 0;
+                level3 = 1f;
+                myDamage = false;
             }
         }
 

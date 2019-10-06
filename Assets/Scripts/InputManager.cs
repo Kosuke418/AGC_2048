@@ -18,11 +18,6 @@ public class InputManager : MonoBehaviour
     {
         gm = GameObject.FindObjectOfType<ThisGameManager>();
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
