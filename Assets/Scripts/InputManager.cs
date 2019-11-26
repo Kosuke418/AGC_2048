@@ -24,22 +24,22 @@ public class InputManager : MonoBehaviour
     {
         if (gm.State == GameState.Playing)
         {
-            if (Input.GetKeyDown(KeyCode.RightArrow))
+            if (Input.GetKeyDown(KeyCode.D))
             {
                 //right move
                 gm.Move(MoveDirection.Right);
             }
-            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            else if (Input.GetKeyDown(KeyCode.A))
             {
                 //left move
                 gm.Move(MoveDirection.Left);
             }
-            else if (Input.GetKeyDown(KeyCode.UpArrow))
+            else if (Input.GetKeyDown(KeyCode.W))
             {
                 //up move
                 gm.Move(MoveDirection.Up);
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            else if (Input.GetKeyDown(KeyCode.S))
             {
                 //down move
                 gm.Move(MoveDirection.Down);

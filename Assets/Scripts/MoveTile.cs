@@ -8,15 +8,13 @@ public class MoveTile : MonoBehaviour
     [SerializeField, Range(0, 10)]
     float time = 1;
 
-    [SerializeField]
-    Vector3 endPosition;
-
-    //[SerializeField]
-    //AnimationCurve curve;
+    Vector3 endPosition = new Vector3 (0,3.5f,0);
 
     private float startTime;
     private Vector3 startPosition;
     private GameObject obj;
+
+    public Image enemy;
 
     private void Start()
     {
@@ -59,24 +57,5 @@ public class MoveTile : MonoBehaviour
             Instantiate(obj, transform.position, Quaternion.identity);
             Destroy(this.gameObject);
         }
-    }
-
-
-    void OnDrawGizmosSelected()
-    {
-#if UNITY_EDITOR
-
-        if (!UnityEditor.EditorApplication.isPlaying || enabled == false)
-        {
-            startPosition = transform.position;
-        }
-
-        UnityEditor.Handles.Label(endPosition, endPosition.ToString());
-        UnityEditor.Handles.Label(startPosition, startPosition.ToString());
-#endif
-        Gizmos.DrawSphere(endPosition, 0.1f);
-        Gizmos.DrawSphere(startPosition, 0.1f);
-
-        Gizmos.DrawLine(startPosition, endPosition);
     }
 }

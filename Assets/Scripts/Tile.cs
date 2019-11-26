@@ -120,7 +120,7 @@ public class Tile : MonoBehaviour
         TileImage.enabled = false;//画像を見えないように
     }
 
-    // クリックされたときナンバーをログに表示し，画像を非表示にする
+    // クリックされたとき同じナンバーのオブジェクトをインスタンス化する
     public void OnClickAct()
     {
         if (TileImage.sprite != null)

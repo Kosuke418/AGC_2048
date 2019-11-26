@@ -25,7 +25,7 @@ public class ThisGameManager : MonoBehaviour
     private List<Tile> EmptyTiles = new List<Tile>(); //tile型の長さ可変配列の型の変数
 
     [SerializeField]
-    private Text damageText;
+    private GameObject damageUI;
     [SerializeField]
     private Text myDamageText;
     [SerializeField]
@@ -186,13 +186,15 @@ public class ThisGameManager : MonoBehaviour
         Timer += Time.deltaTime;
         // Debug.Log(EmptyTiles.Count);
 
+        /*
         if (Timer >= 5f)
         {
-            damageColor.enabled = true;
+            //damageColor.enabled = true;
             float level2 = Mathf.Abs(Mathf.Sin(Time.time * 10)) - 0.5f;
             level3 -= 0.02f;
-            damageColor.color = new Color(1f, 0f, 0f, level2);
-            myDamageText.color = new Color(1f, 0f, 0f, level3);
+            //damageColor.color = new Color(1f, 0f, 0f, level2);
+            //myDamageText.color = new Color(1f, 0f, 0f, level3);
+            /*
             if (!myDamage)
             {
                 MyHP -= 10;
@@ -201,15 +203,19 @@ public class ThisGameManager : MonoBehaviour
                 MyHPText.text = "HP" + MyHP.ToString();
                 myDamage = true;
             }
+            
             if (level3 <= 0f)
             {
-                damageColor.color = new Color(0f, 0f, 0f, 0f);
-                damageColor.enabled = false;
+                //damageColor.color = new Color(0f, 0f, 0f, 0f);
+                //damageColor.enabled = false;
                 Timer = 0;
                 level3 = 1f;
                 myDamage = false;
             }
+            
         }
+        */
+        
 
         if (EmptyTiles.Count == 15)
         {
@@ -218,7 +224,6 @@ public class ThisGameManager : MonoBehaviour
 
         if(HP <= 0)
         {
-            // SceneManager.LoadScene("");
             HP = 100;
             HPSlider.value = HP;
             HPText.text = "HP" + HP.ToString();
@@ -227,27 +232,20 @@ public class ThisGameManager : MonoBehaviour
         if (Click)
         {
             UpdateEmptyTiles();
-            damageText.enabled = true;
-            damageText.text = "-" + TileNumber.ToString();
             if (!damage)
             {
+                GameObject damageText = (GameObject)Instantiate(damageUI, new Vector3(0, 0, 0), Quaternion.identity);
+                damageText.GetComponentInChildren<Text>().text = TileNumber.ToString();
                 HP -= TileNumber;
                 HPSlider.value = HP;
                 HPText.text = "HP" + HP.ToString();
                 damage = true;
             }
             level -= 0.05f;
-            damageText.color = new Color(1f, 0f, 0f, level);
             if (level <= 0f)
             {
                 Click = false;
             }
-        }
-        else
-        {
-            damageText.enabled = false;
-            damageText.color = new Color(0f, 0f, 0f, 1f);
-            level = 1f;
         }
     }
 
