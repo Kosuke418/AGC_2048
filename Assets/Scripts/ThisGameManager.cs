@@ -20,9 +20,9 @@ public class ThisGameManager : MonoBehaviour
     private bool[] lineMoveComplete = new bool[4] { true, true, true, true };
 
     private Tile[,] AllTiles = new Tile[4, 4];
-    private List<Tile[]> columns = new List<Tile[]>(); //list 長さ可変配列の型
-    private List<Tile[]> rows = new List<Tile[]>();   //tile配列型の長さ可変配列型の変数
-    private List<Tile> EmptyTiles = new List<Tile>(); //tile型の長さ可変配列の型の変数
+    private List<Tile[]> columns = new List<Tile[]>();
+    private List<Tile[]> rows = new List<Tile[]>();
+    private List<Tile> EmptyTiles = new List<Tile>();
 
     [SerializeField]
     private GameObject damageUI;
@@ -53,6 +53,8 @@ public class ThisGameManager : MonoBehaviour
 
     float Timer = 0;
 
+    public bool isMistakeCircle = false;
+
     // Use this for initialization
     void Start()
     { // 初期化
@@ -79,8 +81,8 @@ public class ThisGameManager : MonoBehaviour
         Generate();
         Generate();
 
-        HPSlider = GameObject.Find("Slider").GetComponent<Slider>();
-        MyHPSlider = GameObject.Find("Slider (1)").GetComponent<Slider>();
+        HPSlider = GameObject.Find("EnemyHP").GetComponent<Slider>();
+        MyHPSlider = GameObject.Find("PlayerHP").GetComponent<Slider>();
         damageColor = GameObject.Find("DamageColor").GetComponent<Image>();
         HPSlider.value = HP;
         MyHPSlider.value = MyHP;
@@ -111,50 +113,50 @@ public class ThisGameManager : MonoBehaviour
     }
 
     //動き
-    bool MakeOneMoveDownIndex(Tile[] LineOfTIles)
+    bool MakeOneMoveDownIndex(Tile[] LineOfTiles)
     {
-        for (int i = 0; i < LineOfTIles.Length - 1; i++)
+        for (int i = 0; i < LineOfTiles.Length - 1; i++)
         {
             //Move block
-            if (LineOfTIles[i].Number == 0 && LineOfTIles[i + 1].Number != 0)
+            if (LineOfTiles[i].Number == 0 && LineOfTiles[i + 1].Number != 0)
             {
-                LineOfTIles[i].Number = LineOfTIles[i + 1].Number;
-                LineOfTIles[i + 1].Number = 0;
+                LineOfTiles[i].Number = LineOfTiles[i + 1].Number;
+                LineOfTiles[i + 1].Number = 0;
 
                 return true;
             }
             //MERGE BLOCK
-            if (LineOfTIles[i].Number != 0 && LineOfTIles[i].Number == LineOfTIles[i + 1].Number &&
-                LineOfTIles[i].mergedThisTurn == false && LineOfTIles[i + 1].mergedThisTurn == false)
+            if (LineOfTiles[i].Number != 0 && LineOfTiles[i].Number == LineOfTiles[i + 1].Number &&
+                LineOfTiles[i].mergedThisTurn == false && LineOfTiles[i + 1].mergedThisTurn == false)
             {
-                LineOfTIles[i].Number *= 2;
-                LineOfTIles[i + 1].Number = 0;
-                LineOfTIles[i].mergedThisTurn = true;
-                LineOfTIles[i].PlayMergeAnimation();
+                LineOfTiles[i].Number *= 2;
+                LineOfTiles[i + 1].Number = 0;
+                LineOfTiles[i].mergedThisTurn = true;
+                LineOfTiles[i].PlayMergeAnimation();
                 return true;
             }
         }
         return false;
     }
-    bool MakeOneMoveUpIndex(Tile[] LineOfTIles)
+    bool MakeOneMoveUpIndex(Tile[] LineOfTiles)
     {
-        for (int i = LineOfTIles.Length - 1; i > 0; i--)
+        for (int i = LineOfTiles.Length - 1; i > 0; i--)
         {
             //Move block
-            if (LineOfTIles[i].Number == 0 && LineOfTIles[i - 1].Number != 0)
+            if (LineOfTiles[i].Number == 0 && LineOfTiles[i - 1].Number != 0)
             {
-                LineOfTIles[i].Number = LineOfTIles[i - 1].Number;
-                LineOfTIles[i - 1].Number = 0;
+                LineOfTiles[i].Number = LineOfTiles[i - 1].Number;
+                LineOfTiles[i - 1].Number = 0;
                 return true;
             }
             //MERGE BLOCK
-            if (LineOfTIles[i].Number != 0 && LineOfTIles[i].Number == LineOfTIles[i - 1].Number &&
-                LineOfTIles[i].mergedThisTurn == false && LineOfTIles[i - 1].mergedThisTurn == false)
+            if (LineOfTiles[i].Number != 0 && LineOfTiles[i].Number == LineOfTiles[i - 1].Number &&
+                LineOfTiles[i].mergedThisTurn == false && LineOfTiles[i - 1].mergedThisTurn == false)
             {
-                LineOfTIles[i].Number *= 2;
-                LineOfTIles[i - 1].Number = 0;
-                LineOfTIles[i].mergedThisTurn = true;
-                LineOfTIles[i].PlayMergeAnimation();
+                LineOfTiles[i].Number *= 2;
+                LineOfTiles[i - 1].Number = 0;
+                LineOfTiles[i].mergedThisTurn = true;
+                LineOfTiles[i].PlayMergeAnimation();
                 return true;
             }
         }
@@ -183,40 +185,8 @@ public class ThisGameManager : MonoBehaviour
 
     private void Update()
     {
+
         Timer += Time.deltaTime;
-        // Debug.Log(EmptyTiles.Count);
-
-        /*
-        if (Timer >= 5f)
-        {
-            //damageColor.enabled = true;
-            float level2 = Mathf.Abs(Mathf.Sin(Time.time * 10)) - 0.5f;
-            level3 -= 0.02f;
-            //damageColor.color = new Color(1f, 0f, 0f, level2);
-            //myDamageText.color = new Color(1f, 0f, 0f, level3);
-            /*
-            if (!myDamage)
-            {
-                MyHP -= 10;
-                myDamageText.text = "-" + 10;
-                MyHPSlider.value = MyHP;
-                MyHPText.text = "HP" + MyHP.ToString();
-                myDamage = true;
-            }
-            
-            if (level3 <= 0f)
-            {
-                //damageColor.color = new Color(0f, 0f, 0f, 0f);
-                //damageColor.enabled = false;
-                Timer = 0;
-                level3 = 1f;
-                myDamage = false;
-            }
-            
-        }
-        */
-        
-
         if (EmptyTiles.Count == 15)
         {
             Generate();

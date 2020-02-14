@@ -6,23 +6,23 @@ public class EnemyShotScript : MonoBehaviour
 {
     public GameObject enemyShotP;
     public GameObject enemyShotG;
-    public GameObject enemy;
+    public GameObject player;
 
     void EnemyShot(int num)
     {
-        int Pos = Random.Range(0, 12);
+        int Pos = Random.Range(75,106);
         if(num==0)
-        Instantiate(enemyShotP, new Vector3 (enemy.transform.position.x + SetPosition(Pos).x,enemy.transform.position.y + SetPosition(Pos).y, enemy.transform.position.z), Quaternion.identity);
+        Instantiate(enemyShotP, new Vector3(player.transform.position.x + SetPosition(Pos).x, player.transform.position.y + SetPosition(Pos).y, player.transform.position.z), Quaternion.identity);
         else if(num==1)
-        Instantiate(enemyShotG, new Vector3(enemy.transform.position.x + SetPosition(Pos).x, enemy.transform.position.y + SetPosition(Pos).y, enemy.transform.position.z), Quaternion.identity);
+        Instantiate(enemyShotG, new Vector3(player.transform.position.x + SetPosition(Pos).x, player.transform.position.y + SetPosition(Pos).y, player.transform.position.z), Quaternion.identity);
 
     }
 
-    Vector3 SetPosition(int Num)
+    Vector3 SetPosition(int randomPos)
     {
         Vector3 ans = new Vector3();
-        ans.x = 2*Mathf.Cos(Num * 30 * (Mathf.PI / 180));
-        ans.y = 2*Mathf.Sin(Num * 30 * (Mathf.PI / 180));
+        ans.x = 8*Mathf.Cos(randomPos * (Mathf.PI / 180));
+        ans.y = 8*Mathf.Sin(randomPos * (Mathf.PI / 180));
         return ans;
     }
 
@@ -46,17 +46,12 @@ public class EnemyShotScript : MonoBehaviour
     IEnumerator EnemyShotRoutine()
     {
         float num;
-        int shotNum;
         int ColorNum;
         while (true)
         {
-            num = Random.Range(0f, 1.5f);
-            shotNum = Random.Range(0, 2);
+            num = Random.Range(0.2f, 1.5f);
             ColorNum = Random.Range(0, 2);
-                for(int i = 0; i < shotNum; i++)
-                {
-                    EnemyShot(ColorNum);
-                }
+            EnemyShot(ColorNum);
             yield return new WaitForSeconds(num);
         }
     }

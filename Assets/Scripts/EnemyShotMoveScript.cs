@@ -1,20 +1,63 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyShotMoveScript : MonoBehaviour
 {
-	public float shotSpeed=0.05f;
-	// Start is called before the first frame update
-	void Start()
-	{
+    private float startTime1 = 0f;
+    private float startTime2 = 0f;
+    private Vector3 endPosition;
 
-	}
+    private Vector3 startScale = new Vector3(0f, 0f, 0f);
+    private Vector3 endScale = new Vector3(0.2f, 0.2f, 0.2f);
 
-	// Update is called once per frame
-	void Update()
+    // Start is called before the first frame update
+    void Start()
 	{
-		this.transform.position += new Vector3(0, -1, 0) * shotSpeed;
-        if (transform.position.y <= -5) Destroy(gameObject);
-	}
+        endPosition = new Vector3(transform.position.x, -6f, transform.position.z);
+        transform.localScale = startScale;
+        StartCoroutine(GenerateShot());
+    }
+
+    IEnumerator GenerateShot()
+    {
+        float time1 = 1f;
+        float diff = 0;
+        while (transform.localScale != endScale)
+        {
+            diff += Time.deltaTime - startTime1;
+            if (diff > time1)
+            {
+                transform.localScale = endScale;
+            }
+            var rate = diff / time1;
+
+            transform.localScale = Vector3.Lerp(startScale, endScale, rate);
+            yield return new WaitForFixedUpdate();
+        }
+        if (transform.localScale == endScale)
+        {
+            StartCoroutine(MoveShot());
+        }
+    }
+
+    IEnumerator MoveShot()
+    {
+        float time1 = 100f;
+        float diff = 0;
+        while (transform.position != endPosition)
+        {
+            diff += Time.deltaTime - startTime2;
+            if (diff > time1)
+            {
+                transform.position = endPosition;
+            }
+            var rate = diff / time1;
+            transform.position = Vector3.Lerp(transform.position, endPosition, rate);
+            if (transform.position.y <= -5f)
+            {
+                Destroy(gameObject);
+            }
+            yield return new WaitForFixedUpdate();
+        }
+    }
 }

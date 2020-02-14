@@ -5,9 +5,17 @@ using UnityEngine;
 public class MagicCircleScaleScript : MonoBehaviour
 {
     public float scaleSpeed = 0.01f;
-    // Start is called before the first frame update
 
-    // Update is called once per frame
+    ShakeCamera shakeCamera;
+    MagicCircleScript magicCircleScript;
+
+
+    private void Start()
+    {
+        shakeCamera = GameObject.Find("GameObject").GetComponent<ShakeCamera>();
+        magicCircleScript = GameObject.Find("EventSystem").GetComponent<MagicCircleScript>();
+    }
+
     void Update()
     {
         this.transform.localScale += new Vector3(1, 1, 1) * scaleSpeed;
@@ -24,19 +32,37 @@ public class MagicCircleScaleScript : MonoBehaviour
         {
             Destroy(other.gameObject);
             Destroy(gameObject);
+            magicCircleScript.InstansMagicCircle.RemoveAt(0);
         }
         else if (other.tag == "EnemyShotG" && this.tag == "MagicCircleG")
         {
             Destroy(other.gameObject);
             Destroy(gameObject);
+            magicCircleScript.InstansMagicCircle.RemoveAt(0);
         }
         else if (other.tag == "EnemyShotP" && this.tag == "MagicCircleG")
         {
-
+            Destroy(other.gameObject);
+            Destroy(gameObject);
+            magicCircleScript.Canshot();
+            shakeCamera.Shake(0.25f,2f);
+            foreach(GameObject obj in magicCircleScript.InstansMagicCircle)
+            {
+                Destroy(obj);
+            }
+            magicCircleScript.InstansMagicCircle.Clear();
         }
         else if (other.tag == "EnemyShotG" && this.tag == "MagicCircleP")
         {
-
+            Destroy(other.gameObject);
+            Destroy(gameObject);
+            magicCircleScript.Canshot();
+            shakeCamera.Shake(0.25f, 2f);
+            foreach (GameObject obj in magicCircleScript.InstansMagicCircle)
+            {
+                Destroy(obj);
+            }
+            magicCircleScript.InstansMagicCircle.Clear();
         }
     }
 }
