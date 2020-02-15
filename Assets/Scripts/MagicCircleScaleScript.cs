@@ -32,13 +32,13 @@ public class MagicCircleScaleScript : MonoBehaviour
         {
             Destroy(other.gameObject);
             Destroy(gameObject);
-            magicCircleScript.InstansMagicCircle.RemoveAt(0);
+            if(magicCircleScript.InstansMagicCircle.Count!=0) magicCircleScript.InstansMagicCircle.RemoveAt(0);
         }
         else if (other.tag == "EnemyShotG" && this.tag == "MagicCircleG")
         {
             Destroy(other.gameObject);
             Destroy(gameObject);
-            magicCircleScript.InstansMagicCircle.RemoveAt(0);
+            if (magicCircleScript.InstansMagicCircle.Count != 0) magicCircleScript.InstansMagicCircle.RemoveAt(0);
         }
         else if (other.tag == "EnemyShotP" && this.tag == "MagicCircleG")
         {

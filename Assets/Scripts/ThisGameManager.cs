@@ -41,7 +41,7 @@ public class ThisGameManager : MonoBehaviour
     public static bool damage = false;
     public static bool myDamage = false;
 
-    private int HP = 100;
+    private int enemyHP = 100;
     private int MyHP = 100;
 
     Slider HPSlider;
@@ -54,6 +54,8 @@ public class ThisGameManager : MonoBehaviour
     float Timer = 0;
 
     public bool isMistakeCircle = false;
+
+    bool isDamage = false;
 
     // Use this for initialization
     void Start()
@@ -84,9 +86,10 @@ public class ThisGameManager : MonoBehaviour
         HPSlider = GameObject.Find("EnemyHP").GetComponent<Slider>();
         MyHPSlider = GameObject.Find("PlayerHP").GetComponent<Slider>();
         damageColor = GameObject.Find("DamageColor").GetComponent<Image>();
-        HPSlider.value = HP;
+        damageColor.enabled = false;
+        HPSlider.value = enemyHP;
         MyHPSlider.value = MyHP;
-        HPText.text = "HP" + HP.ToString();
+        HPText.text = "HP" + enemyHP.ToString();
         MyHPText.text = "HP" + MyHP.ToString();
     }
 
@@ -192,11 +195,11 @@ public class ThisGameManager : MonoBehaviour
             Generate();
         }
 
-        if(HP <= 0)
+        if(enemyHP <= 0)
         {
-            HP = 100;
-            HPSlider.value = HP;
-            HPText.text = "HP" + HP.ToString();
+            enemyHP = 100;
+            HPSlider.value = enemyHP;
+            HPText.text = "HP" + enemyHP.ToString();
         }
 
         if (Click)
@@ -206,9 +209,9 @@ public class ThisGameManager : MonoBehaviour
             {
                 GameObject damageText = (GameObject)Instantiate(damageUI, new Vector3(0, 0, 0), Quaternion.identity);
                 damageText.GetComponentInChildren<Text>().text = TileNumber.ToString();
-                HP -= TileNumber;
-                HPSlider.value = HP;
-                HPText.text = "HP" + HP.ToString();
+                enemyHP -= TileNumber;
+                HPSlider.value = enemyHP;
+                HPText.text = "HP" + enemyHP.ToString();
                 damage = true;
             }
             level -= 0.05f;
@@ -216,6 +219,12 @@ public class ThisGameManager : MonoBehaviour
             {
                 Click = false;
             }
+        }
+
+        if (isDamage)
+        {
+            float level4 = Mathf.Abs(Mathf.Sin(Time.time * 10)/2);
+            damageColor.color = new Color(1f, 0f, 0f, level4);
         }
     }
 
@@ -233,6 +242,16 @@ public class ThisGameManager : MonoBehaviour
             if (t.Number == 0)
                 EmptyTiles.Add(t);
         }
+    }
+
+    public void Damage()
+    {
+        damageColor.enabled = true;
+        isDamage = true;
+        MyHP -= 5;
+        MyHPSlider.value = MyHP;
+        MyHPText.text = "HP" + MyHP.ToString();
+        StartCoroutine(ColorCoroutine());
     }
 
     public void Move(MoveDirection md)
@@ -282,6 +301,17 @@ public class ThisGameManager : MonoBehaviour
             UpdateEmptyTiles();
             Generate();
         }
+    }
+
+    IEnumerator ColorCoroutine()
+    {
+        // 1秒間処理を止める
+        yield return new WaitForSeconds(1);
+
+        // １秒後ダメージフラグをfalseにして点滅を戻す
+        isDamage = false;
+        damageColor.enabled = false;
+        damageColor.color = new Color(1f, 1f, 1f, 1f);
     }
 
     IEnumerator MoveOneLineUpIndexCoroutine(Tile[] line, int index)
